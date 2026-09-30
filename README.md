@@ -69,6 +69,12 @@ docling-guard compare BEFORE.json AFTER.json [--json] [--fail-on-drop]
 - `compare` does not align pages or match semantically equivalent wording. It catches missing content and exact text changes, not every OCR error.
 - This tool never sends document contents to a service. It reads local files only.
 
+## Related projects
+
+- [papercompass](https://github.com/Arthur031221/papercompass): If you feed arXiv PDFs through Docling before indexing them, this checks the export first.
+- [receiptwise](https://github.com/Arthur031221/receiptwise): A different local extraction pipeline that a similar regression check could cover.
+- [labexplain](https://github.com/Arthur031221/labexplain): Same idea applied to lab reports: extract locally, check the extraction before you trust it.
+
 ## Contributing and license
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). MIT, copyright 2026 Arthur.

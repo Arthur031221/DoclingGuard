@@ -114,5 +114,42 @@ class CheckTests(unittest.TestCase):
             self.assertEqual(code, 1)
 
 
+class RealDocumentTests(unittest.TestCase):
+    """Regression fixtures from real Docling exports, not synthetic ones.
+
+    See tests/data/real/SOURCES.md for provenance.
+    """
+
+    data_dir = Path(__file__).parent / "data" / "real"
+
+    def _check(self, name: str) -> list[dict]:
+        document = load_document(self.data_dir / name)
+        return check_document(document)["findings"]
+
+    def test_handbook_page_is_clean(self) -> None:
+        self.assertEqual(self._check("amt_handbook_sample.json"), [])
+
+    def test_right_to_left_document_is_clean(self) -> None:
+        self.assertEqual(self._check("right_to_left_01.json"), [])
+
+    def test_newspaper_dehyphenation_overshoot_is_caught(self) -> None:
+        findings = self._check("newspaper-00.json")
+        self.assertEqual(len(findings), 3)
+        self.assertTrue(all(item["code"] == "invalid_charspan" for item in findings))
+
+    def test_marker_item_is_not_a_false_positive(self) -> None:
+        # "orig" keeps a list marker like "b. " that "text" strips. Earlier
+        # versions compared charspan against len(text) and flagged this as
+        # invalid on every enumerated item in the real corpus.
+        orig = "b. Red-annotation of bounding boxes"
+        item = {
+            "text": "Red-annotation of bounding boxes",
+            "orig": orig,
+            "prov": [{"page_no": 1, "charspan": [0, len(orig)]}],
+        }
+        document = {"texts": [item], "tables": []}
+        self.assertEqual(check_document(document)["findings"], [])
+
+
 if __name__ == "__main__":
     unittest.main()

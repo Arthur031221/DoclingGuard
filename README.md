@@ -2,9 +2,9 @@
 
 Catch broken source spans and extraction losses in Docling JSON before they reach a search index.
 
-The synthetic regression fixture catches a provenance span ending 2 characters beyond its 13-character text item, then shows a 6-character text drop between exports.[^fixture] These are test observations, not a measured failure rate in real documents.
+On the 15 real Docling exports in the Docling project's own test suite,[^real] `docling-guard` passes 12 clean and flags 3 with a provenance span that runs past its source text, all from the same dehyphenation pattern reported in [docling-project/docling#4217](https://github.com/docling-project/docling/issues/4217). The synthetic regression fixture in `docling-guard demo` reproduces one such case in isolation.[^fixture]
 
-[![CI](https://github.com/Arthur031221/docling-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/Arthur031221/docling-guard/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](CHANGELOG.md)
+[![CI](https://github.com/Arthur031221/docling-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/Arthur031221/docling-guard/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](CHANGELOG.md)
 
 ![Command line demo](demo/demo.gif)
 
@@ -63,6 +63,7 @@ docling-guard compare BEFORE.json AFTER.json [--json] [--fail-on-drop]
 ## Limits and FAQ
 
 - Inputs must be Docling JSON exports with `texts` and `tables` arrays. Other OCR JSON formats are not accepted in this release.
+- A charspan is checked against `orig` when present, since Docling strips enumeration markers like `"b. "` from `text` but keeps them in `orig`. Checking against `text` instead, as version 0.1.0 did, flagged this on most enumerated items in the real-document sample and is why that release was not measured against real exports.
 - Each input file is capped at 64 MiB to keep memory use predictable. Larger exports need a streaming reader in a later release.
 - A table with more than 2,000 valid cells skips pairwise overlap checks and reports `geometry_skipped`. Bounds are still checked.
 - The table-box rule checks horizontal coordinates and may warn on a legitimate unusual layout. It is not proof of extraction failure.
@@ -79,4 +80,6 @@ docling-guard compare BEFORE.json AFTER.json [--json] [--fail-on-drop]
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). MIT, copyright 2026 Arthur.
 
-[^fixture]: `docling-guard demo` writes one 19-character baseline text item and a 13-character candidate text item with a `[0, 15]` provenance span. The difference is 6 characters, and the candidate span exceeds the text by 2. Run the commands above to reproduce the results. No real document was used for this measurement.
+[^real]: Measured on 2026-10-01 against the 15 JSON files in `docling-project/docling` at commit `d6f03078ad364108df3e7e82e8f0dcc3fd7f39ea`, path `tests/data/pdf/groundtruth/` (arXiv papers, a newspaper interview, a technical handbook, right-to-left documents, and tables). Three of the fixtures are committed in `tests/data/real/` with provenance in `SOURCES.md`; run `scripts/measure_real_documents.sh` to reproduce the full 15-document count. Checking a real document still requires running Docling yourself to produce the JSON; `docling-guard` does not run Docling.
+
+[^fixture]: `docling-guard demo` writes one 19-character baseline text item and a 13-character candidate text item with a `[0, 15]` provenance span. The difference is 6 characters, and the candidate span exceeds the text by 2. Run the commands above to reproduce the results.

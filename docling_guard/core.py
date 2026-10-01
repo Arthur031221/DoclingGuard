@@ -43,6 +43,12 @@ def _check_provenance(item: dict[str, Any], location: str) -> list[dict[str, str
     text = item.get("text")
     if not isinstance(text, str):
         return [_finding("invalid_text", "error", location, "Text item has no string text")]
+    orig = item.get("orig")
+    # charspan indexes into orig, not text: Docling strips enumeration markers like
+    # "b. " from text but keeps them in orig, so a marker item's span legitimately
+    # extends past len(text). Falling back to len(text) only when orig is absent
+    # preserves detection of the real dehyphenation overshoot this tool targets.
+    span_bound = len(orig) if isinstance(orig, str) else len(text)
     prov = item.get("prov", [])
     if not isinstance(prov, list):
         return [_finding("invalid_provenance", "error", location, "prov must be an array")]
@@ -52,14 +58,14 @@ def _check_provenance(item: dict[str, Any], location: str) -> list[dict[str, str
             isinstance(span, list)
             and len(span) == 2
             and all(isinstance(value, int) and not isinstance(value, bool) for value in span)
-            and 0 <= span[0] <= span[1] <= len(text)
+            and 0 <= span[0] <= span[1] <= span_bound
         ):
             findings.append(
                 _finding(
                     "invalid_charspan",
                     "error",
                     f"{location}/prov/{index}",
-                    f"charspan must lie within text length {len(text)}",
+                    f"charspan must lie within source text length {span_bound}",
                 )
             )
     return findings

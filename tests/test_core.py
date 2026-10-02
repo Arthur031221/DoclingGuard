@@ -92,6 +92,25 @@ class CheckTests(unittest.TestCase):
             with self.assertRaises(DocumentError):
                 load_document(path)
 
+    def test_loader_rejects_nonstandard_json_numbers(self) -> None:
+        with tempfile.TemporaryDirectory() as name:
+            path = Path(name) / "nonstandard.json"
+            for value in ("NaN", "Infinity", "-Infinity"):
+                with self.subTest(value=value):
+                    raw = (
+                        '{"texts": [], "tables": [{"data": {"num_rows": 1, '
+                        '"num_cols": 1, "table_cells": [{"start_row_offset_idx": 0, '
+                        '"end_row_offset_idx": 1, "start_col_offset_idx": 0, '
+                        '"end_col_offset_idx": 1, "bbox": {"l": '
+                        + value
+                        + ', "r": 10}}]}}]}'
+                    )
+                    path.write_text(raw, encoding="utf-8")
+                    with self.assertRaisesRegex(
+                        DocumentError, f"Non-standard JSON constant: {value}"
+                    ):
+                        load_document(path)
+
     def test_cli_check_failure(self) -> None:
         with tempfile.TemporaryDirectory() as name:
             path = Path(name) / "bad.json"

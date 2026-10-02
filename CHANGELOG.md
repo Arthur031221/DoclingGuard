@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Reject non-standard `NaN` and infinity constants when loading JSON exports.
+
 ## 0.2.0
 
 - Fix: check a text item's provenance charspan against `orig` length when

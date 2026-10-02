@@ -15,6 +15,14 @@ class DocumentError(ValueError):
     """An input file cannot be inspected safely."""
 
 
+class _InvalidJSONConstant(ValueError):
+    """A non-standard numeric constant appeared in JSON input."""
+
+
+def _reject_json_constant(value: str) -> None:
+    raise _InvalidJSONConstant(f"Non-standard JSON constant: {value}")
+
+
 def load_document(path: Path) -> dict[str, Any]:
     """Load a bounded JSON file without requiring Docling or model weights."""
     try:
@@ -22,8 +30,8 @@ def load_document(path: Path) -> dict[str, Any]:
         if size > MAX_FILE_BYTES:
             raise DocumentError(f"File exceeds the 64 MiB limit: {path}")
         with path.open("r", encoding="utf-8") as stream:
-            document = json.load(stream)
-    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            document = json.load(stream, parse_constant=_reject_json_constant)
+    except (_InvalidJSONConstant, OSError, UnicodeError, json.JSONDecodeError) as exc:
         raise DocumentError(f"Cannot read Docling JSON {path}: {exc}") from exc
     if not isinstance(document, dict):
         raise DocumentError("Docling JSON must be an object")

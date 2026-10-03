@@ -92,10 +92,16 @@ class CheckTests(unittest.TestCase):
             with self.assertRaises(DocumentError):
                 load_document(path)
 
-    def test_loader_rejects_nonstandard_json_numbers(self) -> None:
+    def test_loader_rejects_nonfinite_json_numbers(self) -> None:
         with tempfile.TemporaryDirectory() as name:
             path = Path(name) / "nonstandard.json"
-            for value in ("NaN", "Infinity", "-Infinity"):
+            values = (
+                ("NaN", "Non-standard JSON constant: NaN"),
+                ("Infinity", "Non-standard JSON constant: Infinity"),
+                ("-Infinity", "Non-standard JSON constant: -Infinity"),
+                ("1e999", "JSON number outside finite range: 1e999"),
+            )
+            for value, error in values:
                 with self.subTest(value=value):
                     raw = (
                         '{"texts": [], "tables": [{"data": {"num_rows": 1, '
@@ -107,7 +113,7 @@ class CheckTests(unittest.TestCase):
                     )
                     path.write_text(raw, encoding="utf-8")
                     with self.assertRaisesRegex(
-                        DocumentError, f"Non-standard JSON constant: {value}"
+                        DocumentError, error
                     ):
                         load_document(path)
 

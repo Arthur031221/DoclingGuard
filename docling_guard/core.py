@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -15,12 +16,19 @@ class DocumentError(ValueError):
     """An input file cannot be inspected safely."""
 
 
-class _InvalidJSONConstant(ValueError):
-    """A non-standard numeric constant appeared in JSON input."""
+class _InvalidJSONNumber(ValueError):
+    """A JSON number cannot be represented as a finite Python float."""
 
 
 def _reject_json_constant(value: str) -> None:
-    raise _InvalidJSONConstant(f"Non-standard JSON constant: {value}")
+    raise _InvalidJSONNumber(f"Non-standard JSON constant: {value}")
+
+
+def _parse_json_float(value: str) -> float:
+    parsed = float(value)
+    if not math.isfinite(parsed):
+        raise _InvalidJSONNumber(f"JSON number outside finite range: {value}")
+    return parsed
 
 
 def load_document(path: Path) -> dict[str, Any]:
@@ -30,8 +38,12 @@ def load_document(path: Path) -> dict[str, Any]:
         if size > MAX_FILE_BYTES:
             raise DocumentError(f"File exceeds the 64 MiB limit: {path}")
         with path.open("r", encoding="utf-8") as stream:
-            document = json.load(stream, parse_constant=_reject_json_constant)
-    except (_InvalidJSONConstant, OSError, UnicodeError, json.JSONDecodeError) as exc:
+            document = json.load(
+                stream,
+                parse_constant=_reject_json_constant,
+                parse_float=_parse_json_float,
+            )
+    except (_InvalidJSONNumber, OSError, UnicodeError, json.JSONDecodeError) as exc:
         raise DocumentError(f"Cannot read Docling JSON {path}: {exc}") from exc
     if not isinstance(document, dict):
         raise DocumentError("Docling JSON must be an object")

@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-- Reject non-standard `NaN` and infinity constants when loading JSON exports.
+- Reject non-standard `NaN` and infinity constants and overflowed numeric values
+  such as `1e999` when loading JSON exports.
 
 ## 0.2.0
 

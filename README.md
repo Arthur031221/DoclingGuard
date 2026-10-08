@@ -1,6 +1,6 @@
 <h1 align="center">
   <img src="assets/logo.svg" width="72" alt=""><br>
-  docling-guard
+  DoclingGuard
 </h1>
 
 <p align="center">
@@ -8,9 +8,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Arthur031221/docling-guard/stargazers"><img src="https://img.shields.io/github/stars/Arthur031221/docling-guard?style=social" alt="GitHub stars"></a>
-  <a href="https://github.com/Arthur031221/docling-guard/actions"><img src="https://github.com/Arthur031221/docling-guard/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/Arthur031221/docling-guard" alt="MIT license"></a>
+  <a href="https://github.com/Arthur031221/DoclingGuard/stargazers"><img src="https://img.shields.io/github/stars/Arthur031221/DoclingGuard?style=social" alt="GitHub stars"></a>
+  <a href="https://github.com/Arthur031221/DoclingGuard/actions"><img src="https://github.com/Arthur031221/DoclingGuard/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/Arthur031221/DoclingGuard" alt="MIT license"></a>
 </p>
 
 <p align="center">
@@ -23,14 +23,14 @@
 > [!TIP]
 > Try the demo without a permanent install:
 > ```sh
-> uvx --from git+https://github.com/Arthur031221/docling-guard.git docling-guard demo
+> uvx --from git+https://github.com/Arthur031221/DoclingGuard.git DoclingGuard demo
 > ```
 
 <p align="center">
   <img src="assets/demo.gif" alt="The terminal runs the synthetic fixture and compares its before and after exports, showing a text drop." width="100%">
 </p>
 
-## Why docling-guard
+## Why DoclingGuard
 
 Document conversion can return valid JSON even when important details are wrong. [A Docling issue](https://github.com/docling-project/docling/issues/4217) reports source spans extending past extracted text after dehyphenation. [Another report](https://github.com/docling-project/docling/issues/4189) describes text from one table column extending over the next. A downstream RAG or document pipeline may only notice the damage after indexing.
 
@@ -52,7 +52,7 @@ On the 15 real Docling exports in the Docling project's own test suite, version 
 Python 3.10 or newer is required. Install from Git:
 
 ```sh
-python3 -m pip install git+https://github.com/Arthur031221/docling-guard.git
+python3 -m pip install git+https://github.com/Arthur031221/DoclingGuard.git
 ```
 
 From a local checkout, run:
@@ -96,14 +96,14 @@ These outputs use two committed exports from Docling's test suite:
   <tr>
     <td width="50%" valign="top">
       <b>Clean technical handbook page</b><br>
-      <code>docling-guard check tests/data/real/amt_handbook_sample.json</code>
+      <code>DoclingGuard check tests/data/real/amt_handbook_sample.json</code>
       <pre>Text items: 26
 Tables: 0
 Findings: 0</pre>
     </td>
     <td width="50%" valign="top">
       <b>Newspaper interview with overlong spans</b><br>
-      <code>docling-guard check tests/data/real/newspaper-00.json</code>
+      <code>DoclingGuard check tests/data/real/newspaper-00.json</code>
       <pre>Text items: 55
 Tables: 0
 Findings: 3</pre>
@@ -121,7 +121,7 @@ The newspaper export produces three `invalid_charspan` findings from the same de
 
 ### Comparison
 
-| Tool | What it does | Where docling-guard differs |
+| Tool | What it does | Where DoclingGuard differs |
 | --- | --- | --- |
 | [Docling JSON export](https://docling-project.github.io/docling/usage/supported_formats/) | Preserves document structure and table spans | Does not compare two exports for this workflow |
 | `git diff --no-index` | Shows raw JSON changes | Does not identify invalid spans or summarize extraction loss |
@@ -193,7 +193,7 @@ No. It does not align pages or match semantically equivalent wording. It catches
 </details>
 
 <details>
-<summary><b>Does docling-guard run OCR or send documents to a service?</b></summary>
+<summary><b>Does DoclingGuard run OCR or send documents to a service?</b></summary>
 
 No. It reads local files only, does not run OCR or load model weights, and never sends document contents to a service.
 
@@ -210,7 +210,7 @@ No. It reads local files only, does not run OCR or load model weights, and never
 
 ## Contributing
 
-Open an [issue](https://github.com/Arthur031221/docling-guard/issues) with a minimal, redacted Docling JSON fixture before adding a rule. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidance on offline checks and potential false positives.
+Open an [issue](https://github.com/Arthur031221/DoclingGuard/issues) with a minimal, redacted Docling JSON fixture before adding a rule. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidance on offline checks and potential false positives.
 
 ## License
 

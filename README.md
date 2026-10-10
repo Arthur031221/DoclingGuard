@@ -215,3 +215,5 @@ Open an [issue](https://github.com/Arthur031221/DoclingGuard/issues) with a mini
 ## License
 
 MIT, copyright 2026 Arthur.
+
+Assisted by Claude/Codex.
